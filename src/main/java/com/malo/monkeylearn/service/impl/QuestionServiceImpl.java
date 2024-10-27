@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.malo.monkeylearn.common.BaseResponse;
 import com.malo.monkeylearn.common.ErrorCode;
-import com.malo.monkeylearn.common.ResultUtils;
 import com.malo.monkeylearn.constant.CommonConstant;
 import com.malo.monkeylearn.exception.ThrowUtils;
 import com.malo.monkeylearn.mapper.QuestionMapper;
@@ -266,6 +264,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
                 Set<Long> questionIdSet = questionList.stream().map(QuestionBankQuestion::getQuestionId)
                         .collect(Collectors.toSet());
                 queryWrapper.in("id", questionIdSet);
+            } else {
+                return new Page<>(current, size, 0);
             }
         }
         // 查询数据库

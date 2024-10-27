@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.malo.monkeylearn.common.ErrorCode;
 import com.malo.monkeylearn.constant.CommonConstant;
-import com.malo.monkeylearn.exception.BusinessException;
 import com.malo.monkeylearn.exception.ThrowUtils;
 import com.malo.monkeylearn.mapper.QuestionBankQuestionMapper;
 import com.malo.monkeylearn.model.dto.questionBankQuestion.QuestionBankQuestionQueryRequest;
@@ -24,8 +23,8 @@ import com.malo.monkeylearn.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.context.Theme;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +47,7 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
     private UserService userService;
 
     @Resource
+    @Lazy
     private QuestionService questionService;
 
     @Resource

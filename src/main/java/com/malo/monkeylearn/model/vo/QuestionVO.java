@@ -59,6 +59,11 @@ public class QuestionVO implements Serializable {
     private UserVO user;
 
     /**
+     * 答案
+     */
+    private String answer;
+
+    /**
      * 封装类转对象
      *
      * @param questionVO

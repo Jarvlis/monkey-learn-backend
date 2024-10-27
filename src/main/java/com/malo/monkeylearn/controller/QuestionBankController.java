@@ -21,6 +21,7 @@ import com.malo.monkeylearn.model.entity.QuestionBank;
 import com.malo.monkeylearn.model.entity.QuestionBankQuestion;
 import com.malo.monkeylearn.model.entity.User;
 import com.malo.monkeylearn.model.vo.QuestionBankVO;
+import com.malo.monkeylearn.model.vo.QuestionVO;
 import com.malo.monkeylearn.service.QuestionBankService;
 import com.malo.monkeylearn.service.QuestionService;
 import com.malo.monkeylearn.service.UserService;
@@ -154,8 +155,12 @@ public class QuestionBankController {
         if (needQueryQuestionList) {
             QuestionQueryRequest questionQueryRequest = new QuestionQueryRequest();
             questionQueryRequest.setQuestionBankId(id);
+            // 按需支持更多的题目搜索参数，比如分页
+            questionQueryRequest.setPageSize(questionBankQueryRequest.getPageSize());
+            questionQueryRequest.setCurrent(questionBankQueryRequest.getCurrent());
             Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
-            questionBankVO.setQuestionPage(questionPage);
+            Page<QuestionVO> questionVOPage = questionService.getQuestionVOPage(questionPage, request);
+            questionBankVO.setQuestionPage(questionVOPage);
         }
 
         // 获取封装类
@@ -192,7 +197,7 @@ public class QuestionBankController {
         long current = questionBankQueryRequest.getCurrent();
         long size = questionBankQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(size > 200, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Page<QuestionBank> questionBankPage = questionBankService.page(new Page<>(current, size),
                 questionBankService.getQueryWrapper(questionBankQueryRequest));
