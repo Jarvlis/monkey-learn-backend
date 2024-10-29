@@ -11,7 +11,7 @@ import java.util.List;
  * @author <a href="https://github.com/jarvlis">Jarvlis</a>
  
  */
-public interface PostMapper extends BaseMapper<Post> {
+public interface Q extends BaseMapper<Post> {
 
     /**
      * 查询帖子列表（包括已被删除的数据）

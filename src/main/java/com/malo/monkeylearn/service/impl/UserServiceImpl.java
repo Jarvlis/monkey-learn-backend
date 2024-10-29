@@ -3,38 +3,50 @@ package com.malo.monkeylearn.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.malo.monkeylearn.common.ErrorCode;
 import com.malo.monkeylearn.constant.CommonConstant;
+import com.malo.monkeylearn.constant.RedisConstant;
 import com.malo.monkeylearn.constant.UserConstant;
 import com.malo.monkeylearn.exception.BusinessException;
+import com.malo.monkeylearn.mapper.UserMapper;
 import com.malo.monkeylearn.model.dto.user.UserQueryRequest;
 import com.malo.monkeylearn.model.entity.User;
 import com.malo.monkeylearn.model.enums.UserRoleEnum;
 import com.malo.monkeylearn.model.vo.LoginUserVO;
 import com.malo.monkeylearn.model.vo.UserVO;
 import com.malo.monkeylearn.service.UserService;
-import com.malo.monkeylearn.common.ErrorCode;
-import com.malo.monkeylearn.mapper.UserMapper;
 import com.malo.monkeylearn.utils.SqlUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBitSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 用户服务实现
  *
  * @author <a href="https://github.com/jarvlis">Jarvlis</a>
- 
  */
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    @Resource
+    private RedissonClient redissonClient;
+
 
     /**
      * 盐值，混淆密码
@@ -267,5 +279,54 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
+    }
+
+    /**
+     * 添加用户签到记录
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public boolean addUserSignIn(long userId) {
+        LocalDate date = LocalDate.now();
+        String key = RedisConstant.getUserSignInRedisKey(date.getYear(), userId);
+        // 获取 Redis 的 BitMap
+        RBitSet signInBitSet = redissonClient.getBitSet(key);
+        // 获取当前日期市一年中的第几天，作为偏移量，从1开始计数
+        int offset = date.getDayOfYear();
+        if (!signInBitSet.get(offset)) {
+            // 如果当前未签到，则设置
+            signInBitSet.set(offset);
+        }
+        // 当天已签到
+        return true;
+    }
+
+    /**
+     * 获取今年的签到记录
+     *
+     * @param userId
+     * @param year   要获取的年份，为空则默认今年
+     * @return 签到记录的映射
+     */
+    @Override
+    public List<Integer> getUserSignInMap(long userId, Integer year) {
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+        String key = RedisConstant.getUserSignInRedisKey(year, userId);
+        // 获取 Redis 的 BitMap
+        RBitSet signInBitSet = redissonClient.getBitSet(key);
+        // 加载bitset到内存中，避免频繁查询redis
+        BitSet bitSet = signInBitSet.asBitSet();
+        // 构造返回结果
+        List<Integer> dayList = new ArrayList<>();
+        int index = bitSet.nextSetBit(0);
+        while (index >= 0) {
+            dayList.add(index);
+            index = bitSet.nextSetBit(index + 1);
+        }
+        return dayList;
     }
 }

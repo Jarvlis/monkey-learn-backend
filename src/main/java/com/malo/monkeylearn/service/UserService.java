@@ -7,7 +7,9 @@ import com.malo.monkeylearn.model.entity.User;
 import com.malo.monkeylearn.model.vo.LoginUserVO;
 import com.malo.monkeylearn.model.vo.UserVO;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
@@ -119,4 +121,19 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
+    /**
+     * 添加用户签到记录
+     *
+     * @param userId
+     * @return
+     */
+    boolean addUserSignIn(long userId);
+
+    /**
+     * 获取今年的签到记录
+     * @param userId
+     * @param year 要获取的年份，为空则默认今年
+     * @return 签到记录的映射
+     */
+    List<Integer> getUserSignInMap(long userId, Integer year);
 }

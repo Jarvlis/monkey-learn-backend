@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class PostMapperTest {
 
     @Resource
-    private PostMapper postMapper;
+    private Q postMapper;
 
     @Test
     void listPostWithDelete() {

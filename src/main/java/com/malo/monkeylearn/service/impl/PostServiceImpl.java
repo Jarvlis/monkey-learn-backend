@@ -15,7 +15,7 @@ import com.malo.monkeylearn.model.vo.UserVO;
 import com.malo.monkeylearn.service.UserService;
 import com.malo.monkeylearn.common.ErrorCode;
 import com.malo.monkeylearn.mapper.PostFavourMapper;
-import com.malo.monkeylearn.mapper.PostMapper;
+import com.malo.monkeylearn.mapper.Q;
 import com.malo.monkeylearn.mapper.PostThumbMapper;
 import com.malo.monkeylearn.model.entity.Post;
 import com.malo.monkeylearn.model.entity.PostFavour;
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements PostService {
+public class PostServiceImpl extends ServiceImpl<Q, Post> implements PostService {
 
     @Resource
     private UserService userService;

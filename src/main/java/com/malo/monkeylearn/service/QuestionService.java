@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.malo.monkeylearn.common.BaseResponse;
+import com.malo.monkeylearn.model.dto.post.PostQueryRequest;
 import com.malo.monkeylearn.model.dto.question.QuestionQueryRequest;
+import com.malo.monkeylearn.model.entity.Post;
 import com.malo.monkeylearn.model.entity.Question;
 import com.malo.monkeylearn.model.vo.QuestionVO;
 
@@ -59,4 +61,12 @@ public interface QuestionService extends IService<Question> {
      * @return
      */
     Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest);
+
+    /**
+     * 从 ES 查询题目
+     *
+     * @param questionQueryRequest
+     * @return
+     */
+    Page<Question> searchFromEs(QuestionQueryRequest questionQueryRequest);
 }
